@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="top-bar">
+      <h2>Minhas Tarefas</h2>
+      <button class="logout-btn" onclick="logout()">Sair</button>
+    </div>
+
+    <div class="task-input">
+      <input type="text" id="taskInput" placeholder="Digite uma nova tarefa">
+      <button onclick="addTask()">Adicionar</button>
+    </div>
+
+    <ul id="taskList"></ul>
+  </div>
+
+<script>
+const token = localStorage.getItem("token");
+
+if (!token) {
+  window.location.href = "login.html";
+}
+
+async function loadTasks() {
+  const response = await fetch("http://localhost:3000/tasks", {
+    headers: { Authorization: token }
+  });
+
+  const tasks = await response.json();
+  const list = document.getElementById("taskList");
+  list.innerHTML = "";
+
+  tasks.forEach(task => {
+    const li = document.createElement("li");
+    li.className = task.completed ? "completed" : "";
+
+    li.innerHTML = `
+      <span>${task.title}</span>
+      <div>
+        <button onclick="toggleTask(${task.id}, ${task.completed})">✔</button>
+        <button class="delete" onclick="deleteTask(${task.id})">🗑</button>
+      </div>
+    `;
+
+    list.appendChild(li);
+  });
+}
+
+async function addTask() {
+  await fetch("http://localhost:3000/tasks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token
+    },
+    body: JSON.stringify({ title: taskInput.value })
+  });
+
+  taskInput.value = "";
+  loadTasks();
+}
+
+async function toggleTask(id, completed) {
+  await fetch(`http://localhost:3000/tasks/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: token
+    },
+    body: JSON.stringify({ completed: !completed })
+  });
+
+  loadTasks();
+}
+
+async function deleteTask(id) {
+  await fetch(`http://localhost:3000/tasks/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: token }
+  });
+
+  loadTasks();
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  window.location.href = "login.html";
+}
+
+loadTasks();
+</script>
+</body>
+</html>

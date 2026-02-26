@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cadastro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Criar Conta</h2>
+
+    <form id="registerForm">
+      <input type="text" placeholder="Nome" id="name" required>
+      <input type="email" placeholder="Email" id="email" required>
+      <input type="password" placeholder="Senha" id="password" required>
+      <button type="submit">Cadastrar</button>
+    </form>
+
+    <p>Já tem conta? <a href="login.html">Login</a></p>
+  </div>
+<script>
+document.getElementById("registerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const response = await fetch("http://localhost:3000/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: name.value,
+      email: email.value,
+      password: password.value
+    })
+  });
+
+  const data = await response.json();
+  alert(data.message);
+});
+</script>
+</body>
+</html>
