@@ -27,7 +27,7 @@ if (!token) {
 }
 
 async function loadTasks() {
-  const response = await fetch("http://localhost:3000/tasks", {
+  const response = await fetch("https://web-production-3afa1.up.railway.app/tasks", {
     headers: { Authorization: token }
   });
 
